@@ -838,7 +838,7 @@ end
     attribute :flags, String
 
   	attribute :start, String
-    attribute :third_party_id, String
+
 
   	
 
@@ -855,6 +855,7 @@ end
   	element :src_path, String
   	element :src_modified, String
     element :comment, String
+    element :third_party_id, String
   	element 'AudioMatrix', AudioMatrix
     element 'ActiveAspect',String
 
