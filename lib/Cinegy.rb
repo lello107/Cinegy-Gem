@@ -5,7 +5,23 @@ require "uuidtools"
 require 'rubygems'
 require 'streamio-ffmpeg'
 
+
+module Enumerable
+  def each_with_previous
+    self.inject(nil){|prev, curr| yield prev, curr; curr}
+    self
+  end
+end
+
 module Cinegy
+
+
+def self.save_pl(pl,path)
+    file = File.new(path, "wb")
+    puts file.write(pl.to_xml)
+    puts file.close
+end
+
   # Your code goes here...
  def self.addzero(val)
       newval=""
@@ -28,7 +44,7 @@ end
     pl.programs.last.blocks.last.items.push(item)
   end
 
- def convert_to_frames_tc(timecode)
+ def self.convert_to_frames_tc(timecode)
 
 
         frames =0
@@ -48,8 +64,75 @@ end
 
   end
 
+    def self.add_timecode(timecode1, timecode2)
+        tc1 ,tc2 = 0
+        tc1 = self.convert_to_frames(timecode1)
+        tc2 = self.convert_to_frames(timecode2)
+        return self.convert_from_frames(tc1 + tc2)
+  end
+  def self.diff_timecode(timecode1, timecode2)
+        
+        tc1 ,tc2 = 0
+        tc1 = self.convert_to_frames(timecode1)
+        tc2 = self.convert_to_frames(timecode2)
+        return self.convert_from_frames(tc1 - tc2)
+  end
 
- def self.convert_from_frames(seconds)
+    def self.convert_to_frames(timecode,semicolon=false)
+
+          frames =0
+
+          #Split the timecode string into it's component parts. NOTE: The string must
+          #be in the form hh:mm:ss:ff otherwise an error will occur.
+          unless semicolon
+           tc = timecode.split(":")
+          else
+           tc =timecode.split(";")
+          end
+
+          #The following are based on 25 fps.
+          frames = (tc[0].to_i * 90000 + tc[1].to_i* 1500) + tc[2].to_i * 25 + tc[3].to_i
+
+
+          return frames
+
+
+      end
+
+       def self.convert_from_frames(frames)
+
+        intHours, intMins, intSecs, intFrames, intTmp=0
+        timecode =""
+
+        #Convert frames to hours, minutes and seconds.
+
+        #Total number of seconds
+        intSecs = (frames / 25).to_i
+
+        #Total number of minutes
+        intMins = (intSecs / 60).to_i
+
+        #Total number of hours
+        intHours = (intSecs / 3600).to_i
+
+        #Number of secs remaining after subtracting  number of mins.
+        intSecs = ((frames / 25) - (intMins * 60)).to_i
+
+        #Number of mins remaining after subtracting number of hours.
+        intMins = intMins - (intHours * 60)
+
+        #Determine the number of frames remaining after subtracting hours,mins and secs
+        intTmp = intSecs * 25
+        intTmp = intTmp + (intMins * 60 * 25)
+        intTmp = intTmp + (intHours * 60 * 60 * 25)
+        intFrames = frames - intTmp
+
+        #Convert to string, adding leading 0 where value is less than 10,and separating with ':'
+        timecode = addzero(intHours.to_s)  + ":" + addzero(intMins.to_s) + ":" + addzero(intSecs.to_s) + ":" + addzero(intFrames.to_s)
+        return timecode
+  end
+
+ def self.convert_from_seconds(seconds)
         arr_time = seconds.to_s.split('.')
         puts arr_time.inspect
         frames_ = (arr_time[1].to_f/100 * 25).to_i.round(1).to_i
@@ -100,6 +183,153 @@ end
 
   end
 
+
+  def self.search_spotfile()
+    spot_file_path ="/Users/lello107/Documents/spotfile16.MCRlist"
+    spot_list = Cinegy::Playlist.parse(File.read(spot_file_path))
+
+
+    groups = []
+    dur = 0
+    new_start=0
+    bool_picchetto = false
+    start = 0
+    store_last=0
+    edit_index=[]
+
+    grouppo=0
+    indice=0
+
+
+
+    spot_list.programs.each do |pr|
+      pr.blocks.each do |block|
+        block.items.each_with_previous do |prev_item, item|
+
+        if item.flags == "0x10" 
+          grouppo+=1
+        end
+
+        groups.push({:item=>item,:start=>item.start,:gruppo=>grouppo,:order=>indice}) 
+    #if item.name.match(/Dummy/)d.select {|v| v[:gruppo] == 1}
+
+        end
+        indice+=1
+      end
+    end
+
+    return groups
+
+  end
+
+
+  def self.search_name(pl_path,spot_file_path,destination_path)
+    #pl_path="/Users/lello107/Documents/16aprile.MCRlist"
+    pl = Cinegy::Playlist.parse(File.read(pl_path))
+
+    spot_file = search_spotfile()
+
+
+    #groups = search_spotfile()
+
+
+    dummies=[]
+    stime = 0
+
+    dur = 0
+    new_start=0
+    bool_picchetto = false
+    start = 0
+    store_last=0
+    edit_index=[]
+
+    gruppo=1
+
+
+    pl.programs.each do |pr|
+      pr.blocks.each do |block|
+        block.items.each_with_previous do |prev_item, item|
+
+        next if item == nil
+
+        #puts "#{item.name} #{item.timeline.duration}" if item.timeline
+      
+        begin
+          #puts "#{item.name} #{diff_timecode(item.out,item.in)}" if !item.timeline
+        rescue 
+          #puts "------------------------- #{item.name}"
+        end
+
+        puts "------------ > #{item.name}"
+
+        if item.flags == "0x10" 
+         
+          start = convert_to_frames(item.start) if item.start != nil
+          bool_picchetto=true
+          new_start = start
+          dur = convert_to_frames(diff_timecode(item.out,item.in)) if item.out != nil and item.in != nil
+
+        else 
+          
+          if item.equal? block.items.last
+            store_last = convert_to_frames(diff_timecode(item.out,item.in)) if item.out != nil and !bool_picchetto if item
+          end
+          if item.equal? block.items.first
+            dur = store_last
+          else
+            dur = convert_to_frames(diff_timecode(prev_item.out,prev_item.in)) if prev_item.out != nil and prev_item.in != nil and !bool_picchetto if prev_item
+          end
+          new_start += dur
+          new_start = new_start-2160000 if new_start > 2160000
+          bool_picchetto=false
+
+        end 
+  
+          index = block.items.index(item)+1
+          if item.name.match(/Dummy/)
+
+            tolereance = "00:21:00:00"
+             g = spot_file.select {|v| v[:gruppo] == gruppo}.sort_by {|i| i[:order]}.reverse!.map{|x| x[:item]}
+
+             diff = convert_to_frames(g.first.start.gsub(";",":")) - new_start
+
+
+            if(diff > convert_to_frames(tolereance))
+              print "index:#{index} gruppo:#{gruppo} dummy_start:#{convert_from_frames(new_start)} gruppo_start:#{g.first.start.gsub(";",":")} differenza:#{convert_from_frames(diff)}\n " if g.size>0
+            else
+          
+
+                block.items.delete_at(index-1)
+                                  
+                 #dummies.push({:item=>item,:start=>convert_from_frames(new_start)}) 
+
+                 #print "index:#{index} gruppo:#{gruppo} dummy_start:#{convert_from_frames(new_start)} gruppo_start:#{g.first.start.gsub(";",":")}\r " if g.size>0
+                 #sleep(0.2)
+
+                 g.each_with_index do |spot_item,i|
+                  spot_item.flags="0"
+                  spot_item.comment="#{spot_item.start.gsub(";",":")}"
+                  block.items.insert(index,spot_item)
+                 end
+
+                 gruppo+=1
+
+            end
+
+
+             
+          end
+
+
+
+        end
+      end
+    end
+
+    #return dummies
+    save_pl(pl,destination_path)
+
+  end
 
 
 
@@ -388,11 +618,11 @@ end
 
   end
 
-  def self.save_pl(pl)
-    file = File.new("/Users/lello107/Documents/my_xml_data_file.MCRlist", "wb")
-    puts file.write(pl.to_xml)
-    puts file.close
-  end
+  # def self.save_pl(pl)
+  #   file = File.new("/Users/lello107/Documents/my_xml_data_file.MCRlist", "wb")
+  #   puts file.write(pl.to_xml)
+  #   puts file.close
+  # end
 
   def self.print_items(playlist)
      playlist.programs[0].blocks.each do |block|
@@ -608,6 +838,7 @@ end
     attribute :flags, String
 
   	attribute :start, String
+    attribute :third_party_id, String
 
   	
 
@@ -674,7 +905,7 @@ end
     #  "#{UUIDTools::UUID.random_create}"
     #end
 
-  def save_pl
+  def save_pl()
     file = File.new("/Users/lello107/Documents/my_xml_data_file.MCRlist", "wb")
     puts file.write(self.to_xml)
     puts file.close
