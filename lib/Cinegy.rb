@@ -16,6 +16,13 @@ end
 module Cinegy
 
 
+
+def self.change_spotfile(pl,pp )
+
+
+end
+
+
 def self.save_pl(pl,path)
     file = File.new(path, "wb")
     puts file.write(pl.to_xml)
@@ -184,8 +191,8 @@ end
   end
 
 
-  def self.search_spotfile()
-    spot_file_path ="/Users/lello107/Documents/spotfile16.MCRlist"
+  def self.search_spotfile(spot_file_path)
+    #spot_file_path =spot_file_path#"/Users/lello107/Documents/spotfile16.MCRlist"
     spot_list = Cinegy::Playlist.parse(File.read(spot_file_path))
 
 
@@ -227,7 +234,7 @@ end
     #pl_path="/Users/lello107/Documents/16aprile.MCRlist"
     pl = Cinegy::Playlist.parse(File.read(pl_path))
 
-    spot_file = search_spotfile()
+    spot_file = search_spotfile(spot_file_path)
 
 
     #groups = search_spotfile()
@@ -291,12 +298,12 @@ end
             tolereance = "00:21:00:00"
              g = spot_file.select {|v| v[:gruppo] == gruppo}.sort_by {|i| i[:order]}.reverse!.map{|x| x[:item]}
 
-             diff = convert_to_frames(g.first.start.gsub(";",":")) - new_start
+             #diff = convert_to_frames(g.first.start.gsub(";",":")) - new_start
 
 
-            if(diff > convert_to_frames(tolereance))
-              print "index:#{index} gruppo:#{gruppo} dummy_start:#{convert_from_frames(new_start)} gruppo_start:#{g.first.start.gsub(";",":")} differenza:#{convert_from_frames(diff)}\n " if g.size>0
-            else
+            #if(diff > convert_to_frames(tolereance))
+              #print "index:#{index} gruppo:#{gruppo} dummy_start:#{convert_from_frames(new_start)} gruppo_start:#{g.first.start.gsub(";",":")} differenza:#{convert_from_frames(diff)}\n " if g.size>0
+            #else
           
 
                 block.items.delete_at(index-1)
@@ -314,7 +321,7 @@ end
 
                  gruppo+=1
 
-            end
+           # end
 
 
              
@@ -857,7 +864,7 @@ end
     element :comment, String
 
     element :third_party_id, String
-    
+
   	element 'AudioMatrix', AudioMatrix
     element 'ActiveAspect',String
 
