@@ -922,18 +922,18 @@ end
     puts file.close
   end
 
-  def puts_comments
-  comments = []  
+  # def puts_comments
+  # comments = []  
 
-  self.programs.each_with_index do |pr,i|
-     pr.blocks.each_with_index do |bl,e|
-       bl.items.each_with_index do |item,x|
-         comments.push({:programs=>i,:blocks=>e, :item=>x, :comment=>item.comment,:item=>item})
-       end
-     end
-   end
-   return comments
-  end
+  # self.programs.each_with_index do |pr,i|
+  #    pr.blocks.each_with_index do |bl,e|
+  #      bl.items.each_with_index do |item,x|
+  #        comments.push({:programs=>i,:blocks=>e, :item=>x, :comment=>item.comment,:item=>item})
+  #      end
+  #    end
+  #  end
+  #  return comments
+  # end
 
   def append_item(item)
     self.programs.last.blocks.last.items.push(item)
