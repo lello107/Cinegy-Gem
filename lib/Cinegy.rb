@@ -757,8 +757,8 @@ end
   	tag :quality
 
   	attribute :src, String
-  	attribute :id, String
     attribute :track, String,:state_when_nil=>false
+    attribute :id, String
 
   end
 
@@ -799,6 +799,7 @@ end
   	attribute :height, String, :state_when_nil=>false
   	attribute :aspect, String, :state_when_nil=>false
   	attribute :framerate, String, :state_when_nil=>false
+    attribute :startline, String, :state_when_nil=>false
   	attribute :progressive, String, :state_when_nil=>false
   	attribute :channels, String, :state_when_nil=>false
 
@@ -824,8 +825,8 @@ end
 
     tag 'AudioMatrix'
 
-    attribute :description, String
     attribute :name, String
+    attribute :description, String  
     attribute :value, String
     attribute :default, String
 
