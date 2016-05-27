@@ -139,6 +139,12 @@ end
         return timecode
   end
 
+ def self.convert_to_seconds(timecode)
+    frames = convert_to_frames(timecode)
+    seconds = frames / 25.00
+    return seconds
+ end  
+
  def self.convert_from_seconds(seconds)
         arr_time = seconds.to_s.split('.')
         puts arr_time.inspect
@@ -612,6 +618,78 @@ end
 
   end
 
+
+  def self.insert_luminose(pl,trigger="#")
+    
+      reg_exp = Regexp.new(/(#)(.*)(#)/)
+      ## OGNI PROGRAMMA
+      pl.programs.each do |program|
+        ## OGNI BLOCCO
+        program.blocks.each do |block|
+          ## OGNI PROGRAMMA ##
+          block.items.each do |item|
+              begin
+                start,testo,fine = item.comment.match(reg_exp).captures
+                if(start==trigger and fine == trigger)
+                  self.luminosa(item,testo)
+                end
+              rescue Exception => e
+                 puts e
+              end
+
+          end
+          ## FINE OGNI CLIP 
+        end
+        ## FINE OGNI BLOCCO
+      end
+      ## FINE OGNI PROGRAMMA
+  end
+
+  def self.luminosa(item, testo_luminosa)
+
+  if(item.timeline!=nil)
+    event = Cinegy::Event.new
+    event.offset="+0"
+    event.device="*CG_LOGO"
+    event.cmd="SHOW"
+    event.name="LUMINOSA"
+    event.description="Luminosa inserita dal sistema"
+    event.id = "{#{UUIDTools::UUID.random_create}}"
+    event.skip="0"
+    event.op1="C:\\Users\\Cinegy\\Documents\\CinegyType\\Luminosa.CinType"
+    event.op2="<variables><var name=\"orainonda.Text.Value\" type=\"Text\" value=\"#{testo_luminosa}\"/></variables>"
+  end
+
+
+
+    if(item.timeline!=nil)
+      if(item.timeline.groups!=nil)
+        durata = diff_timecode(item.out,item.in)
+        durata = convert_to_seconds(durata)
+        valore_out =(durata*10000000).to_i #(item.timeline.groups.first.tracks.first.clip.stop.to_f * 10000000).to_i
+        event_out = Cinegy::Event.new
+        event_out.offset="+#{valore_out}"
+        event_out.device="*CG_LOGO"
+        event_out.cmd="HIDE"
+        event_out.name="LUMINOSA"
+        event_out.description="Luminosa inserita dal sistema"
+        event_out.id = "{#{UUIDTools::UUID.random_create}}"
+        event_out.skip="0"
+        event_out.op1="HIDE"
+        event_out.op2="<variables></variables>"
+      end
+    end
+    #return events
+
+    events = Cinegy::Events.new
+    events.event=[]
+    events.event.push(event)
+    events.event.push(event_out)
+
+    item.events = events
+
+  end
+
   def self.add_block_and_program(pl,item)
     b = Cinegy::Block.new
     pl.programs[0].blocks.push(b)
@@ -712,7 +790,7 @@ end
       end
     }
 
-    has_one 'op2', String# , :state_when_nil=>false, :on_save => lambda {|op2|  Nokogiri::XML(op2.to_xml).root.to_xml if op2 }
+    has_one 'op2', String, :state_when_nil=>false#, :on_save => lambda {|op2|  Nokogiri::XML(op2.to_xml).root.to_xml if op2 }
 
     def op1
       valore =@op1
