@@ -630,13 +630,13 @@ end
           block.items.each do |item|
               begin
                 
-                if(item.comment!="" or != nil)
+                if(item.comment!="" or item.comment != nil)
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
                     self.luminosa(item,testo)
                   end
                 end
-                
+
                   result = items.select{|p| p.name == item.name}
                   if(result.size>0)
                     self.luminosa(item,result.first.name)
