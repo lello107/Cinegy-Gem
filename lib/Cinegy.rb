@@ -619,7 +619,7 @@ end
   end
 
 
-  def self.insert_luminose(pl,trigger="#")
+  def self.insert_luminose(pl,trigger="#",items=[])
     
       reg_exp = Regexp.new(/(#)(.*)(#)/)
       ## OGNI PROGRAMMA
@@ -629,9 +629,17 @@ end
           ## OGNI PROGRAMMA ##
           block.items.each do |item|
               begin
+
                 start,testo,fine = item.comment.match(reg_exp).captures
                 if(start==trigger and fine == trigger)
                   self.luminosa(item,testo)
+                else
+                  result = items.select{|p| p.name == item.name}
+                  if(result.size>0)
+                    self.luminosa(item,result.first.name)
+                  end
+
+
                 end
               rescue Exception => e
                  puts e
