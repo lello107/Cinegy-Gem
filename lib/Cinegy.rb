@@ -637,12 +637,14 @@ end
                   end
                 end
 
+
+              rescue Exception => e
+
                   result = items.select{|p| p.name == item.name}
                   if(result.size>0)
                     self.luminosa(item,result.first.name)
                   end
-
-              rescue Exception => e
+                  
                  puts e
               end
 
