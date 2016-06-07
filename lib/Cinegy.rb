@@ -619,9 +619,9 @@ end
   end
 
 
-  def self.insert_luminose(pl,trigger="#",items=[])
+  def self.insert_luminose(pl,trigger="#",items=[],type_template="X:\\CinegyType\\Luminosa.CinType")
     
-      reg_exp = Regexp.new(/(#)(.*)(#)/)
+      reg_exp = Regexp.new(/(#{trigger})(.*)(#{trigger})/)
       ## OGNI PROGRAMMA
       pl.programs.each do |program|
         ## OGNI BLOCCO
@@ -633,7 +633,7 @@ end
                 if(item.comment!="" or item.comment != nil)
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
-                    self.luminosa(item,testo)
+                    self.luminosa(item,testo.upcase)
                   end
                 end
 
@@ -642,7 +642,7 @@ end
 
                   result = items.select{|p| p.name == item.name}
                   if(result.size>0)
-                    self.luminosa(item,result.first.name)
+                    self.luminosa(item,result.first.name.upcase,type_template)
                   end
                   
                  puts e
@@ -656,7 +656,7 @@ end
       ## FINE OGNI PROGRAMMA
   end
 
-  def self.luminosa(item, testo_luminosa)
+  def self.luminosa(item, testo_luminosa,type_template)
 
   if(item.timeline!=nil)
     event = Cinegy::Event.new
@@ -667,8 +667,8 @@ end
     event.description="Luminosa inserita dal sistema"
     event.id = "{#{UUIDTools::UUID.random_create}}"
     event.skip="0"
-    event.op1="C:\\Users\\Cinegy\\Documents\\CinegyType\\Luminosa.CinType"
-    event.op2="<variables><var name=\"orainonda.Text.Value\" type=\"Text\" value=\"#{testo_luminosa}\"/></variables>"
+    event.op1=type_template
+    event.op2="<variables><var name=\"Text.Text.Value\" type=\"Text\" value=\"#{testo_luminosa}\"/></variables>"
   end
 
 
