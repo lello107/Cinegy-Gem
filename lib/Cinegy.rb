@@ -636,7 +636,7 @@ end
                 if(item.comment!="" or item.comment != nil)
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
-                    self.luminosa(item,testo.upcase)
+                    self.luminosa(item,testo.upcase,type_template)
                     override=false
                   else
                     override=true
