@@ -621,6 +621,9 @@ end
 
   def self.insert_luminose(pl,trigger="#",items=[],type_template="X:\\CinegyType\\Luminosa.CinType")
     
+      #variabile forzata
+      override=true
+
       reg_exp = Regexp.new(/(#{trigger})(.*)(#{trigger})/)
       ## OGNI PROGRAMMA
       pl.programs.each do |program|
@@ -634,6 +637,9 @@ end
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
                     self.luminosa(item,testo.upcase)
+                    override=false
+                  else
+                    override=true
                   end
                 end
 
@@ -641,10 +647,10 @@ end
               rescue Exception => e
 
                   result = items.select{|p| p.name == item.name}
-                  if(result.size>0)
+                  if(result.size>0 and override==true)
                     self.luminosa(item,result.first.name.upcase,type_template)
                   end
-                  
+                  override=true
                  puts e
               end
 
