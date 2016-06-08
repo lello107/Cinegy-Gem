@@ -648,7 +648,7 @@ end
 
                   result = items.select{|p| p.name == item.name}
                   if(result.size>0 and override==true)
-                    self.luminosa(item,result.first.name.upcase,type_template)
+                    self.luminosa(item,result.first.label.upcase,type_template)
                   end
                   override=true
                  puts e
