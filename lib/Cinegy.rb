@@ -619,7 +619,7 @@ end
   end
 
 
-  def self.insert_luminose(pl,trigger="#",items=[],type_template="X:\\CinegyType\\Luminosa.CinType",anticipo=100)
+  def self.insert_luminose(pl,anticipo,trigger="#",items=[],type_template="X:\\CinegyType\\Luminosa.CinType")
     
       #variabile forzata
       override=true
