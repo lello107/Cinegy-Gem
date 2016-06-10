@@ -619,7 +619,7 @@ end
   end
 
 
-  def self.insert_luminose(pl,trigger="#",items=[],type_template="X:\\CinegyType\\Luminosa.CinType")
+  def self.insert_luminose(pl,trigger="#",items=[],type_template="X:\\CinegyType\\Luminosa.CinType",anticipo=100)
     
       #variabile forzata
       override=true
@@ -636,7 +636,7 @@ end
                 if(item.comment!="" or item.comment != nil)
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
-                    self.luminosa(item,testo.upcase,type_template)
+                    self.luminosa(item,testo.upcase,type_template,anticipo)
                     override=false
                   else
                     override=true
@@ -648,7 +648,7 @@ end
 
                   result = items.select{|p| p.name == item.name}
                   if(result.size>0 and override==true)
-                    self.luminosa(item,result.first.label.upcase,type_template)
+                    self.luminosa(item,result.first.label.upcase,type_template,anticipo)
                   end
                   override=true
                  puts e
@@ -662,7 +662,7 @@ end
       ## FINE OGNI PROGRAMMA
   end
 
-  def self.luminosa(item, testo_luminosa,type_template)
+  def self.luminosa(item, testo_luminosa,type_template,anticipo)
 
   if(item.timeline!=nil)
     event = Cinegy::Event.new
@@ -683,7 +683,7 @@ end
       if(item.timeline.groups!=nil)
         durata = diff_timecode(item.out,item.in)
         durata = convert_to_seconds(durata)
-        valore_out =((durata*10000000)-50).to_i #(item.timeline.groups.first.tracks.first.clip.stop.to_f * 10000000).to_i
+        valore_out =((durata*10000000)-anticipo).to_i #(item.timeline.groups.first.tracks.first.clip.stop.to_f * 10000000).to_i
         event_out = Cinegy::Event.new
         event_out.offset="+#{valore_out}"
         event_out.device="*CG_LOGO"
