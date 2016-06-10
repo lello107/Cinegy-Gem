@@ -683,7 +683,8 @@ end
       if(item.timeline.groups!=nil)
         durata = diff_timecode(item.out,item.in)
         durata = convert_to_seconds(durata)
-        valore_out =((durata*10000000)-anticipo).to_i #(item.timeline.groups.first.tracks.first.clip.stop.to_f * 10000000).to_i
+        durata -= anticipo
+        valore_out =((durata*10000000)).to_i #(item.timeline.groups.first.tracks.first.clip.stop.to_f * 10000000).to_i
         event_out = Cinegy::Event.new
         event_out.offset="+#{valore_out}"
         event_out.device="*CG_LOGO"
