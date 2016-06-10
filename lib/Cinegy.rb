@@ -683,7 +683,7 @@ end
       if(item.timeline.groups!=nil)
         durata = diff_timecode(item.out,item.in)
         durata = convert_to_seconds(durata)
-        valore_out =(durata*10000000).to_i #(item.timeline.groups.first.tracks.first.clip.stop.to_f * 10000000).to_i
+        valore_out =((durata*10000000)-50).to_i #(item.timeline.groups.first.tracks.first.clip.stop.to_f * 10000000).to_i
         event_out = Cinegy::Event.new
         event_out.offset="+#{valore_out}"
         event_out.device="*CG_LOGO"
@@ -692,8 +692,8 @@ end
         event_out.description="Luminosa inserita dal sistema"
         event_out.id = "{#{UUIDTools::UUID.random_create}}"
         event_out.skip="0"
-        event_out.op1="HIDE"
-        event_out.op2="<variables></variables>"
+        #event_out.op1="HIDE"
+        #event_out.op2="<variables></variables>"
       end
     end
     #return events
@@ -799,15 +799,15 @@ end
     attribute :id, String, :state_when_nil=>false
     attribute :skip, String, :state_when_nil=>false
 
-    element 'op1', String , :state_when_nil=>false, :on_save => lambda { |op1|
+    element 'op1', String , :state_when_nil=>true, :on_save => lambda { |op1|
       if op1.class == String
         return op1
       else op1.class == Class
-        return Nokogiri::XML(op1.to_xml).root.to_xml
+        return Nokogiri::XML(op1.to_xml).root.to_xml if op1!=nil
       end
     }
 
-    has_one 'op2', String, :state_when_nil=>false#, :on_save => lambda {|op2|  Nokogiri::XML(op2.to_xml).root.to_xml if op2 }
+    has_one 'op2', String, :state_when_nil=>true#, :on_save => lambda {|op2|  Nokogiri::XML(op2.to_xml).root.to_xml if op2 }
 
     def op1
       valore =@op1
