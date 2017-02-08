@@ -639,7 +639,7 @@ end
               begin
                 puts "#{item.name} -- #{item.comment}"
                 if(item.comment!="" or item.comment != nil)
-                       byebug
+
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
                     self.luminosa(item,testo.upcase,type_template,anticipo)
