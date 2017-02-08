@@ -713,7 +713,7 @@ end
     if(item.events==nil)
       item.events = events
     else
-      item.events.push(events.event)
+      item.events.event.push(events.event)
     end
 
   end
