@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "nokogiri-happymapper", "~> 0.5"
   spec.add_dependency "json", "~> 1.8"
   spec.add_dependency "uuidtools", "~> 2.1"
+  spec.add_dependency "byebug"
   spec.add_dependency "streamio-ffmpeg"#, git: "git://github.com/lello107/streamio-ffmpeg.git"
   
 

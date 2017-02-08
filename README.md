@@ -39,3 +39,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
+## pl = Cinegy::Playlist.parse(File.read("/media/bikeita/BikeVideo/Playlist/10 Giugno.MCRlist"))
+## Cinegy.insert_luminose(pl,3000,"@",Item.all,"X:\\CinegyType\\Luminosa.CinType")
+## Cinegy.save_pl(pl,"/home/bike/CinegyTranslator/public/test.MCRlist")

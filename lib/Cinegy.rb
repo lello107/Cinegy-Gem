@@ -4,6 +4,7 @@ require 'nokogiri'
 require "uuidtools"
 require 'rubygems'
 require 'streamio-ffmpeg'
+require 'byebug'
 
 
 module Enumerable
@@ -621,6 +622,7 @@ end
 
   def self.insert_luminose(pl,anticipo,trigger="#",items=[],type_template="X:\\CinegyType\\Luminosa.CinType")
     
+
       #variabile forzata
       override=true
 
@@ -631,9 +633,13 @@ end
         program.blocks.each do |block|
           ## OGNI PROGRAMMA ##
           block.items.each do |item|
+
+
+
               begin
                 puts "#{item.name} -- #{item.comment}"
                 if(item.comment!="" or item.comment != nil)
+                       byebug
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
                     self.luminosa(item,testo.upcase,type_template,anticipo)
@@ -700,7 +706,7 @@ end
     #return events
 
     events = Cinegy::Events.new
-    events.event=[]
+    #events.event=[]
     events.event.push(event)
     events.event.push(event_out)
 
