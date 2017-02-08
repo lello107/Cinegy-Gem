@@ -706,12 +706,14 @@ end
     #return events
 
     events = Cinegy::Events.new
-    #events.event=[]
+    events.event=[]
     events.event.push(event)
     events.event.push(event_out)
-
-    item.events = events
-
+    if(item.events.present?)
+        item.events.push(events)
+      else
+        item.events = events
+    end
   end
 
   def self.add_block_and_program(pl,item)
