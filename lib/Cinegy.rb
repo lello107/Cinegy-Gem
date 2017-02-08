@@ -639,7 +639,7 @@ end
               begin
                 puts "#{item.name} -- #{item.comment}"
                 if(item.comment!="" or item.comment != nil)
-
+                       byebug
                   start,testo,fine = item.comment.match(reg_exp).captures 
                   if(start==trigger and fine == trigger)
                     self.luminosa(item,testo.upcase,type_template,anticipo)
@@ -709,11 +709,13 @@ end
     events.event=[]
     events.event.push(event)
     events.event.push(event_out)
-    if(item.events.present?)
-        item.events.push(events)
-      else
-        item.events = events
+    #item.events = events
+    if(item.events!=nil)
+      item.events = events
+    else
+      item.events.push(events.event)
     end
+
   end
 
   def self.add_block_and_program(pl,item)
