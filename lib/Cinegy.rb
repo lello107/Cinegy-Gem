@@ -710,7 +710,7 @@ end
     events.event.push(event)
     events.event.push(event_out)
     #item.events = events
-    if(item.events!=nil)
+    if(item.events==nil)
       item.events = events
     else
       item.events.push(events.event)
